@@ -1,0 +1,24 @@
+{
+  "originHash" : "9d5dd5e9c72d9f83dc8ee5633ee2630af5d187ca9255b94b5e4ad96b57639261",
+  "pins" : [
+    {
+      "identity" : "promisekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mxcl/PromiseKit.git",
+      "state" : {
+        "revision" : "8a98e31a47854d3180882c8068cc4d9381bf382d",
+        "version" : "6.22.1"
+      }
+    },
+    {
+      "identity" : "swiftymodbus",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DimaRU/SwiftyModbus.git",
+      "state" : {
+        "revision" : "444406bf0d43bf325073e892256c963e5bf77441",
+        "version" : "2.2.1"
+      }
+    }
+  ],
+  "version" : 3
+}
