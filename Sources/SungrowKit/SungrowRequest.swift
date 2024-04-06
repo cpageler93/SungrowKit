@@ -1,86 +1,41 @@
 //
-//  SungrowMessage.swift
+//  SungrowRequest.swift
 //  SungrowKit
 //
 //  Created by Christoph Pageler on 05.04.24.
 //
 
-public protocol SungrowMessageValueType {
-    init(_ double: Double)
-}
+public struct SungrowRequest {
+    public enum Behavior {
+        case add
+        case subtract
+    }
 
-extension Int: SungrowMessageValueType { }
-extension Double: SungrowMessageValueType { }
-
-public enum SungrowMessageBehavior {
-    case add
-    case subtract
-}
-
-public struct SungrowMessage<ValueType: SungrowMessageValueType> {
     public let address: Int
     public let length: Int
     public let factor: Double
     public let unit: SungrowUnit?
-    public var behaviour: SungrowMessageBehavior = .add
-
-    func convertToResult(registers: [UInt16]) -> ValueType? {
-        switch length {
-        case 1:
-            guard let value = registers[safe: 0] else { return nil }
-            let valueWithFactor = (Double(value) * factor)
-            return ValueType(valueWithFactor)
-        case 2:
-            guard let value1 = registers[safe: 0] else { return nil }
-            guard let value2 = registers[safe: 1] else { return nil }
-
-            let value1WithFactor = (Double(value1) * factor)
-            let value2WithFactor = (Double(value2) * factor)
-
-            switch behaviour {
-            case .add:
-                return ValueType(value1WithFactor + value2WithFactor)
-            case .subtract:
-                return ValueType(value1WithFactor - value2WithFactor)
-            }
-        default:
-            return nil
-        }
-    }
-
-    public func displayValue(value: ValueType) -> String {
-        var components: [String] = []
-
-        components.append("\(value)")
-
-        if let unitShort = unit?.short {
-            components.append(unitShort)
-        }
-
-        return components.joined()
-    }
+    public var behaviour = Behavior.add
 }
 
 /// Datasource: https://gist.github.com/dnoegel/543c72ef722365a3934bbad0bb43e222#file-sungrow_modbus_register-tsv-L31
-public extension SungrowMessage {
-    typealias IntMessage = SungrowMessage<Int>
-    typealias DoubleMessage = SungrowMessage<Double>
-
-    static var deviceTypeCode:      IntMessage      { .init(address: 4999,  length: 1, factor: 1,   unit: nil) }
-    static var nominalOutputPower:  DoubleMessage   { .init(address: 5000,  length: 1, factor: 0.1, unit: .kiloWatt) }
-    static var dailyOutputEnergy:   DoubleMessage   { .init(address: 5002,  length: 1, factor: 0.1, unit: .kiloWattHour) }
-    static var totalOutputEnergy:   DoubleMessage   { .init(address: 5003,  length: 2, factor: 0.1, unit: .kiloWattHour) }
-    static var insideTemperature:   DoubleMessage   { .init(address: 5007,  length: 1, factor: 0.1, unit: .celsius) }
-    static var loadPower:           IntMessage      { .init(address: 13007, length: 2, factor: 1,   unit: .watt) }
-    static var exportPower:         IntMessage      { .init(address: 13009, length: 2, factor: 1,   unit: .watt, behaviour: .subtract) }
-    static var batteryPower:        IntMessage      { .init(address: 13021, length: 1, factor: 1,   unit: .watt)}
-    static var batteryLevel:        DoubleMessage   { .init(address: 13022, length: 1, factor: 0.1, unit: .percentage)}
-    static var batteryHealth:       DoubleMessage   { .init(address: 13023, length: 1, factor: 0.1, unit: .percentage)}
-    static var batteryTemperature:  DoubleMessage   { .init(address: 13024, length: 1, factor: 0.1, unit: .celsius) }
-    static var totalActivePower:    IntMessage      { .init(address: 13033, length: 2, factor: 1,   unit: .watt) }
+public extension SungrowRequest {
+    static var deviceTypeCode:      SungrowRequest { .init(address: 4999,   length: 1, factor: 1,    unit: nil) }
+    static var nominalOutputPower:  SungrowRequest { .init(address: 5000,   length: 1, factor: 0.1,  unit: .kiloWatt) }
+    static var dailyOutputEnergy:   SungrowRequest { .init(address: 5002,   length: 1, factor: 0.1,  unit: .kiloWattHour) }
+    static var totalOutputEnergy:   SungrowRequest { .init(address: 5003,   length: 2, factor: 0.1,  unit: .kiloWattHour) }
+    static var insideTemperature:   SungrowRequest { .init(address: 5007,   length: 1, factor: 0.1,  unit: .celsius) }
+    static var totalDCPower:        SungrowRequest { .init(address: 5016,   length: 2, factor: 1,    unit: .watt) }
+    static var loadPower:           SungrowRequest { .init(address: 13007,  length: 2, factor: 1,    unit: .watt) }
+    static var exportPower:         SungrowRequest { .init(address: 13009,  length: 2, factor: 1,    unit: .watt, behaviour: .subtract) }
+    static var batteryPower:        SungrowRequest { .init(address: 13021,  length: 1, factor: 1,    unit: .watt)}
+    static var batteryLevel:        SungrowRequest { .init(address: 13022,  length: 1, factor: 0.1,  unit: .percentage)}
+    static var batteryHealth:       SungrowRequest { .init(address: 13023,  length: 1, factor: 0.1,  unit: .percentage)}
+    static var batteryTemperature:  SungrowRequest { .init(address: 13024,  length: 1, factor: 0.1,  unit: .celsius) }
+    static var totalActivePower:    SungrowRequest { .init(address: 13033,  length: 2, factor: 1,    unit: .watt) }
 }
 
-public extension SungrowMessage {
+public extension SungrowRequest {
     private static var names: [Int: String] {
         [
             4999:  "Device type code",
