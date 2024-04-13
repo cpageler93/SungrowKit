@@ -23,6 +23,8 @@ public struct SungrowResponse {
         case .percentage:
             numberFormatter.numberStyle = .percent
             return numberFormatter.string(from: NSNumber(value: value / 100.0)) ?? "\(value)"
+        case .binary:
+            return String(Int(value), radix: 2)
         case nil:
             break
         }

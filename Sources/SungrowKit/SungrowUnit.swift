@@ -15,6 +15,7 @@ public enum SungrowUnit {
     case herz
     case kilogram
     case percentage
+    case binary
 
     public var short: String {
         switch self {
@@ -27,6 +28,7 @@ public enum SungrowUnit {
         case .herz:         return "hz"
         case .kilogram:     return "kg"
         case .percentage:   return "%"
+        case .binary:       return ""
         }
     }
 }

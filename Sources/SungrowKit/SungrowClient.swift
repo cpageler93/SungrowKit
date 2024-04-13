@@ -65,6 +65,35 @@ public class SungrowClient {
         }
     }
 
+    public func runningState() async throws -> SungrowRunningState {
+        let response = try await send(request: .runningState)
+        guard let runningState = SungrowRunningState(rawValue: Int(response.value)) else {
+            throw SungrowError.noValue
+        }
+        return runningState
+    }
+
+    /// Sources:
+    /// - https://noegel.io/posts/2022-10-09-sungrow/
+    /// - https://gist.github.com/dnoegel/c6cb7f176d25199c0575dce97ee87253
+    public func powerFlow() async throws -> SungrowPowerFlow {
+        let load = try await send(request: .loadPower).value
+        let grid = try await send(request: .exportPower).value
+        let solar = try await send(request: .totalDCPower).value
+        let battery = try await send(request: .batteryPower).value
+        let runningState = try await runningState()
+
+        return .calculate(
+            input: .init(
+                load: load,
+                grid: grid,
+                solar: solar,
+                battery: battery,
+                runningState: runningState
+            )
+        )
+    }
+
     private func registersToValue(request: SungrowRequest, registers: [UInt16]) -> Double? {
         switch request.length {
         case 1:
