@@ -13,6 +13,8 @@ public class SungrowClient {
     public let port: Int
     public let timeout: TimeInterval
 
+    public private(set) var isConnected = false
+
     private let modbus: SwiftyModbus
 
     public init(
@@ -31,6 +33,12 @@ public class SungrowClient {
 
     public func connect() throws {
         try modbus.connect()
+        isConnected = true
+    }
+
+    public func disconnect() {
+        modbus.disconnect()
+        isConnected = false
     }
 
     public func send(request: SungrowRequest) async throws -> SungrowResponse {
@@ -44,6 +52,12 @@ public class SungrowClient {
                         count: Int32(request.length)
                     )
                 } catch {
+                    if let modbusError = error as? SwiftyModbus.ModbusError {
+                        let isBrokenPipe = modbusError.errno == 32
+                        if isBrokenPipe {
+                            self.isConnected = false
+                        }
+                    }
                     continuation.resume(throwing: SungrowError.failedToReadRegisters)
                     return
                 }

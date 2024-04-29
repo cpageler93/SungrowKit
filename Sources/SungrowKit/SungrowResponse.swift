@@ -20,6 +20,8 @@ public struct SungrowResponse {
             let suffix = " \(unitShort)"
             numberFormatter.positiveSuffix = suffix
             numberFormatter.negativeSuffix = suffix
+            numberFormatter.minimumFractionDigits = 0
+            numberFormatter.maximumFractionDigits = 1
         case .percentage:
             numberFormatter.numberStyle = .percent
             return numberFormatter.string(from: NSNumber(value: value / 100.0)) ?? "\(value)"

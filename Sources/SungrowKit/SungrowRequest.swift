@@ -20,20 +20,25 @@ public struct SungrowRequest {
 
 /// Source: https://github.com/bohdan-s/SunGather/files/8918236/TI_20211231_Communication.Protocol.of.Residential.Hybrid.Inverter_V1.0.23_EN.pdf
 public extension SungrowRequest {
-    static var deviceTypeCode:      SungrowRequest { .init(address: 4999,   length: 1, factor: 1,   unit: nil) }
-    static var nominalOutputPower:  SungrowRequest { .init(address: 5000,   length: 1, factor: 0.1, unit: .kiloWatt) }
-    static var dailyOutputEnergy:   SungrowRequest { .init(address: 5002,   length: 1, factor: 0.1, unit: .kiloWattHour) }
-    static var totalOutputEnergy:   SungrowRequest { .init(address: 5003,   length: 2, factor: 0.1, unit: .kiloWattHour) }
-    static var insideTemperature:   SungrowRequest { .init(address: 5007,   length: 1, factor: 0.1, unit: .celsius) }
-    static var totalDCPower:        SungrowRequest { .init(address: 5016,   length: 2, factor: 1,   unit: .watt) }
-    static var runningState:        SungrowRequest { .init(address: 13000,  length: 1, factor: 1,   unit: .binary)}
-    static var loadPower:           SungrowRequest { .init(address: 13007,  length: 2, factor: 1,   unit: .watt) }
-    static var exportPower:         SungrowRequest { .init(address: 13009,  length: 2, factor: 1,   unit: .watt, behaviour: .subtract) }
-    static var batteryPower:        SungrowRequest { .init(address: 13021,  length: 1, factor: 1,   unit: .watt)}
-    static var batteryLevel:        SungrowRequest { .init(address: 13022,  length: 1, factor: 0.1, unit: .percentage)}
-    static var batteryHealth:       SungrowRequest { .init(address: 13023,  length: 1, factor: 0.1, unit: .percentage)}
-    static var batteryTemperature:  SungrowRequest { .init(address: 13024,  length: 1, factor: 0.1, unit: .celsius) }
-    static var totalActivePower:    SungrowRequest { .init(address: 13033,  length: 2, factor: 1,   unit: .watt) }
+    static var deviceTypeCode:                  SungrowRequest { .init(address: 4999,   length: 1, factor: 1,   unit: nil) }
+    static var nominalOutputPower:              SungrowRequest { .init(address: 5000,   length: 1, factor: 0.1, unit: .kiloWatt) }
+    static var dailyOutputEnergy:               SungrowRequest { .init(address: 5002,   length: 1, factor: 0.1, unit: .kiloWattHour) }
+    static var totalOutputEnergy:               SungrowRequest { .init(address: 5003,   length: 2, factor: 0.1, unit: .kiloWattHour) }
+    static var insideTemperature:               SungrowRequest { .init(address: 5007,   length: 1, factor: 0.1, unit: .celsius) }
+    static var totalDCPower:                    SungrowRequest { .init(address: 5016,   length: 2, factor: 1,   unit: .watt) }
+    static var runningState:                    SungrowRequest { .init(address: 13000,  length: 1, factor: 1,   unit: .binary)}
+    static var dailyPvGeneration:               SungrowRequest { .init(address: 13001,  length: 1, factor: 0.1, unit: .kiloWattHour) }
+    static var loadPower:                       SungrowRequest { .init(address: 13007,  length: 2, factor: 1,   unit: .watt) }
+    static var exportPower:                     SungrowRequest { .init(address: 13009,  length: 2, factor: 1,   unit: .watt, behaviour: .subtract) }
+    static var dailyDirectEnergyConsumption:    SungrowRequest { .init(address: 13016,  length: 1, factor: 0.1, unit: .kiloWattHour)}
+    static var batteryPower:                    SungrowRequest { .init(address: 13021,  length: 1, factor: 1,   unit: .watt)}
+    static var batteryLevel:                    SungrowRequest { .init(address: 13022,  length: 1, factor: 0.1, unit: .percentage)}
+    static var batteryHealth:                   SungrowRequest { .init(address: 13023,  length: 1, factor: 0.1, unit: .percentage)}
+    static var batteryTemperature:              SungrowRequest { .init(address: 13024,  length: 1, factor: 0.1, unit: .celsius) }
+    static var dailyBatteryDischargeEnergy:     SungrowRequest { .init(address: 13025,  length: 1, factor: 0.1, unit: .kiloWattHour) }
+    static var totalActivePower:                SungrowRequest { .init(address: 13033,  length: 2, factor: 1,   unit: .watt) }
+    static var dailyImportEnergy:               SungrowRequest { .init(address: 13035,  length: 1, factor: 0.1, unit: .kiloWattHour) }
+    static var dailyExportEnergy:               SungrowRequest { .init(address: 13044,  length: 1, factor: 0.1, unit: .kiloWattHour) }
 }
 
 public extension SungrowRequest {
