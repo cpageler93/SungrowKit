@@ -11,7 +11,7 @@ public struct SungrowRunningState {
     private var binaryValues: [String]
 
     public init?(rawValue: Int) {
-        var binaryValue = String(rawValue, radix: 2)
+        let binaryValue = String(rawValue, radix: 2)
         var values =  Array(binaryValue).map { "\($0)" }
         while values.count < 8 {
             values.insert("0", at: 0)
@@ -29,5 +29,21 @@ public struct SungrowRunningState {
 
     private func value(at position: Int) -> Bool {
         binaryValues[position] == "1"
+    }
+}
+
+
+extension SungrowRunningState: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        """
+
+        isPowerGeneratedFromPV      : \(isPowerGeneratedFromPV)
+        isBatteryCharging           : \(isBatteryCharging)
+        isBatteryDischarging        : \(isBatteryDischarging)
+        isLoadActive                : \(isLoadActive)
+        isPowerFeedInTheGrid        : \(isPowerFeedInTheGrid)
+        isImportingPowerFromGrid    : \(isImportingPowerFromGrid)
+        isPowerGeneratedFromLoad    : \(isPowerGeneratedFromLoad)
+        """
     }
 }

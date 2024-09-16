@@ -26,11 +26,18 @@ Initialize a SungrowClient:
 let client = SungrowClient(address: "192.168.178.55")
 ```
 
-Fetch data from the inverter:
+Read data from the inverter:
 
 ```swift
-let response = try? await client.send(request: .totalDCPower)
+let response = try? await client.read(request: .totalDCPower)
 let formattedResponseValue = response?.formattedValue ?? "–"
+```
+
+Write data:
+
+```swift
+try await client.write(request: .forcedCharging(isEnabled: true))
+try await client.write(request: .forcedCharging1(.init(from: .init(hour: 2, minute: 3), to: .init(hour: 4, minute: 5), targetSoc: 0.5)))
 ```
 
 ## Note

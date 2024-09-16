@@ -8,6 +8,6 @@
 import Foundation
 
 public enum SungrowError: Error {
-    case failedToReadRegisters
+    case failedToSendRequest
     case noValue
 }

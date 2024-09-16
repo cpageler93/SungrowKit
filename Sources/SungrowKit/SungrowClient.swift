@@ -41,16 +41,30 @@ public class SungrowClient {
         isConnected = false
     }
 
-    public func send(request: SungrowRequest) async throws -> SungrowResponse {
+    public func read<R: SungrowReadRequest>(request: R) async throws -> R.Response {
         try await withCheckedThrowingContinuation { continuation in
             DispatchQueue.global().async {
-                // Try to read input registers
-                let registers: [UInt16]
+                let response: R.Response
                 do {
-                    registers = try self.modbus.readInputRegisters(
-                        addr: Int32(request.address),
-                        count: Int32(request.length)
-                    )
+                    let rawResponse: [UInt16]
+                    switch request.register {
+                    case .input:
+                        rawResponse = try self.modbus.readInputRegisters(
+                            addr: Int32(request.address),
+                            count: Int32(request.length)
+                        )
+                    case .holding:
+                        rawResponse = try self.modbus.readRegisters(
+                            addr: Int32(request.address),
+                            count: Int32(request.length)
+                        )
+                    }
+
+                    guard let convertedResponse = request.convert(rawResponse: rawResponse) else {
+                        throw SungrowError.noValue
+                    }
+
+                    response = convertedResponse
                 } catch {
                     if let modbusError = error as? SwiftyModbus.ModbusError {
                         let isBrokenPipe = modbusError.errno == 32
@@ -58,44 +72,47 @@ public class SungrowClient {
                             self.isConnected = false
                         }
                     }
-                    continuation.resume(throwing: SungrowError.failedToReadRegisters)
+                    continuation.resume(throwing: SungrowError.failedToSendRequest)
                     return
                 }
 
-                // Convert registers to value
-                guard let value = self.registersToValue(request: request, registers: registers) else {
-                    continuation.resume(throwing: SungrowError.noValue)
-                    return
-                }
-
-                // Build response
-                let response = SungrowResponse(
-                    name: request.displayName,
-                    value: value,
-                    unit: request.unit
-                )
                 continuation.resume(returning: response)
             }
         }
     }
 
-    public func runningState() async throws -> SungrowRunningState {
-        let response = try await send(request: .runningState)
-        guard let runningState = SungrowRunningState(rawValue: Int(response.value)) else {
-            throw SungrowError.noValue
+    public func write<R: SungrowWriteRequest>(request: R) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            DispatchQueue.global().async {
+                do {
+                    guard let data = request.convert() else {
+                        throw SungrowError.noValue
+                    }
+                    try self.modbus.writeRegisters(addr: Int32(request.address), data: data)
+                } catch {
+                    if let modbusError = error as? SwiftyModbus.ModbusError {
+                        let isBrokenPipe = modbusError.errno == 32
+                        if isBrokenPipe {
+                            self.isConnected = false
+                        }
+                    }
+                    continuation.resume(throwing: SungrowError.failedToSendRequest)
+                    return
+                }
+                continuation.resume()
+            }
         }
-        return runningState
     }
 
     /// Sources:
     /// - https://noegel.io/posts/2022-10-09-sungrow/
     /// - https://gist.github.com/dnoegel/c6cb7f176d25199c0575dce97ee87253
-    public func powerFlow() async throws -> SungrowPowerFlow {
-        let load = try await send(request: .loadPower).value
-        let grid = try await send(request: .exportPower).value
-        let solar = try await send(request: .totalDCPower).value
-        let battery = try await send(request: .batteryPower).value
-        let runningState = try await runningState()
+    public func readPowerFlow() async throws -> SungrowPowerFlow {
+        let load = try await read(request: .loadPower).value
+        let grid = try await read(request: .exportPower).value
+        let solar = try await read(request: .totalDCPower).value
+        let battery = try await read(request: .batteryPower).value
+        let runningState = try await read(request: .runningState)
 
         return .calculate(
             input: .init(
@@ -106,29 +123,6 @@ public class SungrowClient {
                 runningState: runningState
             )
         )
-    }
-
-    private func registersToValue(request: SungrowRequest, registers: [UInt16]) -> Double? {
-        switch request.length {
-        case 1:
-            guard let value = registers[safe: 0] else { return nil }
-            return Double(value) * request.factor
-        case 2:
-            guard let value1 = registers[safe: 0] else { return nil }
-            guard let value2 = registers[safe: 1] else { return nil }
-
-            let value1WithFactor = Double(value1) * request.factor
-            let value2WithFactor = Double(value2) * request.factor
-
-            switch request.behaviour {
-            case .add:
-                return value1WithFactor + value2WithFactor
-            case .subtract:
-                return value1WithFactor - value2WithFactor
-            }
-        default:
-            return nil
-        }
     }
 
     deinit {
