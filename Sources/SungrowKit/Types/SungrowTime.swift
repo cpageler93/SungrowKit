@@ -16,3 +16,12 @@ public struct SungrowTime {
         self.second = second
     }
 }
+
+extension SungrowTime: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        let hour = String(format: "%02d", hour)
+        let minute = String(format: "%02d", minute)
+        let second = String(format: "%02d", second)
+        return "\(hour):\(minute):\(second)"
+    }
+}

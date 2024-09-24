@@ -72,7 +72,7 @@ public class SungrowClient {
                             self.isConnected = false
                         }
                     }
-                    continuation.resume(throwing: SungrowError.failedToSendRequest)
+                    continuation.resume(throwing: SungrowError.failedToSendRequest(error: error))
                     return
                 }
 
@@ -96,7 +96,7 @@ public class SungrowClient {
                             self.isConnected = false
                         }
                     }
-                    continuation.resume(throwing: SungrowError.failedToSendRequest)
+                    continuation.resume(throwing: SungrowError.failedToSendRequest(error: error))
                     return
                 }
                 continuation.resume()

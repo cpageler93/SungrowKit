@@ -16,3 +16,9 @@ public struct SungrowForcedCharging {
         self.targetSoc = targetSoc
     }
 }
+
+extension SungrowForcedCharging: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        "\(from.debugDescription) -> \(to.debugDescription) => \(Int(targetSoc * 100))%"
+    }
+}

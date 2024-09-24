@@ -10,14 +10,22 @@ import XCTest
 
 final class SungrowKitTests: XCTestCase {
     func testExample() async throws {
-//        let client = SungrowClient(address: "192.168.178.73")
-//        try client.connect()
+        let client = SungrowClient(address: "192.168.178.73")
+        try client.connect()
 
-//        let response = try await client.read(request: .forcedCharging1)
-//        print("Response: \(response)")
-//
-//        try await client.write(request: .forcedCharging(isEnabled: false))
-//        try await client.write(request: .forcedCharging1(.init(from: .init(hour: 2, minute: 3), to: .init(hour: 4, minute: 5), targetSoc: 0.5)))
+        let isForcedChargingEnabled = try await client.read(request: .forcedCharging)
+        let forcedCharging1 = try await client.read(request: .forcedCharging1)
+        let forcedCharging2 = try await client.read(request: .forcedCharging2)
+        if isForcedChargingEnabled {
+            print("ForcedCharging: enabled")
+            print("1: \(forcedCharging1)")
+            print("2: \(forcedCharging2)")
+        } else {
+            print("ForcedCharging: disabled")
+        }
+
+//        try await client.write(request: .forcedCharging1(.init(from: .init(hour: 14, minute: 00), to: .init(hour: 16, minute: 00), targetSoc: 0.95)))
+//        try await client.write(request: .forcedCharging(isEnabled: true))
 
 //        let powerFlow = try await client.readPowerFlow()
 //        print(powerFlow.output)
